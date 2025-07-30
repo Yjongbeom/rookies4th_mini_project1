@@ -1,138 +1,117 @@
-# crawler/steam_crawler.py
-# 스팀 웹크롤링 코드입니다
-
-# crawler/steam_crawler.py
-
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
 import re
-import os
 
 headers = {
-    "User-Agent": "Mozilla/5.0"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 }
 
-def calculate_discount(원가, 할인가):
-    # '정보 없음', 'Free' 등의 경우 제외
-    if "정보 없음" in (원가, 할인가):
-        return "정보 없음"
-    if "Free" in (원가, 할인가):
-        return "0%"
-
-    try:
-        o = int(re.sub(r"[₩,\s]", "", 원가))
-        f = int(re.sub(r"[₩,\s]", "", 할인가))
-        if o > f:
-            return f"{round((1 - f / o) * 100)}%"
-        else:
-            return "0%"
-    except:
-        return "정보 없음"
-
-
-def parse_detail_page(url):
-    """상세 페이지에서 평점, 리뷰, 장르, 연령, 가격 정보 추출"""
-    time.sleep(0.5)
+def get_game_detail(url):
     try:
         res = requests.get(url, headers=headers)
         soup = BeautifulSoup(res.text, "html.parser")
 
-        # 유저 평점
-        review_summary = soup.select_one(".user_reviews_summary_row .game_review_summary")
-        review_summary = review_summary.text.strip() if review_summary else "정보 없음"
+        # 가격 정보
+        price_div = soup.select(".game_purchase_price, .discount_original_price, .discount_final_price")
+        prices = [p.text.strip() for p in price_div if "demo" not in p.text.lower()]
+        prices = [p for p in prices if p]
+
+        if not prices:
+            origin_price = sale_price = "정보 없음"
+        elif len(prices) == 1:
+            origin_price = sale_price = prices[0]
+        else:
+            origin_price = prices[0]
+            sale_price = prices[-1]
+
+        if "무료" in origin_price or "Free" in origin_price:
+            origin_price = sale_price = "Free"
+
+        # 할인율 계산
+        if "₩" in origin_price and "₩" in sale_price and origin_price != sale_price:
+            try:
+                origin_num = int(origin_price.replace("₩", "").replace(",", "").strip())
+                sale_num = int(sale_price.replace("₩", "").replace(",", "").strip())
+                discount = int((1 - sale_num / origin_num) * 100)
+                discount_str = f"{discount}%"
+            except:
+                discount_str = "정보 없음"
+        elif origin_price == sale_price:
+            discount_str = "0%"
+        else:
+            discount_str = "정보 없음"
 
         # 유저 리뷰 수
-        review_count = soup.select_one(".user_reviews_summary_row .responsive_hidden")
-        if review_count:
-            count = re.findall(r'(\d[\d,]*)', review_count.text)
-            review_count = count[0] if count else "정보 없음"
+        review_count_tag = soup.select_one(".user_reviews_summary_row .responsive_hidden")
+        if review_count_tag:
+            review_count = review_count_tag.text.strip().replace(",", "")
+            review_count = re.findall(r"[\d,]+", review_count)[-1]
         else:
             review_count = "정보 없음"
 
-        # 장르
-        genre_tag = soup.select("div.details_block a[href*='genre']")
-        genre = ", ".join([g.text for g in genre_tag]) if genre_tag else "정보 없음"
+        # 유저 댓글 5개
+        comment_divs = soup.select(".review_box .content")[:5]
+        comments = [c.get_text(strip=True) for c in comment_divs if c.get_text(strip=True)]
+        comments_text = "||".join(comments) if comments else "정보 없음"
 
         # 연령 등급
-        age_block = soup.select_one(".details_block")
-        age_text = age_block.text if age_block else ""
-        age_match = re.search(r"Rating:\s*(.*)", age_text)
-        age = age_match.group(1).strip() if age_match else "정보 없음"
+        age_info = soup.select_one(".age_rating_banner")
+        age = age_info.text.strip() if age_info else "정보 없음"
 
-        # 가격 정보 (첫 번째 구매 항목 기준)
-        purchase_block = soup.select_one(".game_area_purchase_game")
-        if purchase_block:
-            original = purchase_block.select_one(".discount_original_price")
-            final = purchase_block.select_one(".discount_final_price")
-            if final:  # 할인 중
-                원가 = original.text.strip() if original else final.text.strip()
-                할인가 = final.text.strip()
-            else:  # 정가만 존재하거나 무료
-                price_text = purchase_block.select_one(".game_purchase_price")
-                원가 = 할인가 = price_text.text.strip() if price_text else "정보 없음"
-        else:
-            원가 = 할인가 = "정보 없음"
+        # 장르
+        genre_tags = soup.select(".details_block a[href*='genre']")
+        genre_list = [g.text.strip() for g in genre_tags if g.text.strip()]
+        genre = ", ".join(genre_list) if genre_list else "정보 없음"
 
-        # 무료 처리
-        for price in [원가, 할인가]:
-            if "Free" in price or "무료" in price or price.strip() in ["₩ 0", "₩0"]:
-                원가 = 할인가 = "Free"
-                break
-
-        할인율 = calculate_discount(원가, 할인가)
-
-        return review_summary, review_count, genre, age, 원가, 할인가, 할인율
+        return origin_price, sale_price, discount_str, review_count, comments_text, age, genre
 
     except Exception as e:
-        print(f"[상세페이지 오류] {url} : {e}")
-        return "정보 없음", "정보 없음", "정보 없음", "정보 없음", "정보 없음", "정보 없음", "0%"
+        print("상세페이지 파싱 실패:", url, e)
+        return "정보 없음", "정보 없음", "정보 없음", "정보 없음", "정보 없음", "정보 없음", "정보 없음"
 
-def crawl_all_pages(max_page=5):
-    base_url = "https://store.steampowered.com/search/?filter=globaltopsellers&page="
-    game_list = []
+def crawl_all_pages(max_page=1):
+    base_url = "https://store.steampowered.com/search/?filter=globaltopsellers&page={}"
+    results = []
 
     for page in range(1, max_page + 1):
-        url = base_url + str(page)
-        print(f"[INFO] 페이지 {page} 수집 중: {url}")
+        print(f"[INFO] 페이지 {page} 수집 중...")
+        url = base_url.format(page)
         res = requests.get(url, headers=headers)
         soup = BeautifulSoup(res.text, "html.parser")
         games = soup.select("a.search_result_row")
 
-        for g in games:
-            try:
-                title = g.select_one("span.title").text.strip()
-                game_url = g["href"]
-                image_url = g.select_one("img")["src"]
-
-                # 상세 페이지 접근
-                유저평점, 유저리뷰, 장르, 연령등급, 원가, 할인가, 할인율 = parse_detail_page(game_url)
-
-                game_list.append({
-                    "게임 이름": title,
-                    "원가": 원가,
-                    "할인가": 할인가,
-                    "사이트 URL": game_url,
-                    "할인율": 할인율,
-                    "유저평점": 유저평점,
-                    "유저리뷰": 유저리뷰,
-                    "플랫폼 이름": "Steam",
-                    "이미지 URL": image_url,
-                    "장르": 장르,
-                    "연령 등급": 연령등급
-                })
-
-            except Exception as e:
-                print(f"[게임 목록 파싱 오류] {e}")
+        for game in games:
+            title = game.select_one(".title").text.strip()
+            link = game["href"].split("?")[0]
+            if "bundle" in link or "sub" in link or "soundtrack" in title.lower():
                 continue
 
-        time.sleep(1)
+            img_url = game.select_one("img")["src"]
+            platform = "Steam"
 
-    return pd.DataFrame(game_list)
+            origin_price, sale_price, discount, review_count, comments, age, genre = get_game_detail(link)
+
+            results.append({
+                "게임 이름": title,
+                "원가": origin_price,
+                "할인가": sale_price,
+                "사이트 URL": link,
+                "할인율": discount,
+                "유저리뷰수": review_count,
+                "유저댓글": comments,
+                "플랫폼 이름": platform,
+                "이미지 URL": img_url,
+                "장르": genre,
+                "연령 등급": age
+            })
+
+            time.sleep(1.5)
+
+    return pd.DataFrame(results)
 
 if __name__ == "__main__":
-    os.makedirs("data", exist_ok=True)
     df = crawl_all_pages(max_page=3)
     df.to_csv("data/steam_detailed_data.csv", index=False, encoding="utf-8-sig")
-    print(f"\n✅ 총 {len(df)}개 게임 정보 저장 완료: data/steam_detailed_data.csv")
+    print("[완료] CSV 저장 완료!")
