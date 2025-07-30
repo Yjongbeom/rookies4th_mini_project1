@@ -15,16 +15,22 @@ headers = {
 }
 
 def calculate_discount(원가, 할인가):
+    # '정보 없음', 'Free' 등의 경우 제외
+    if "정보 없음" in (원가, 할인가):
+        return "정보 없음"
+    if "Free" in (원가, 할인가):
+        return "0%"
+
     try:
-        if "Free" in 원가 or "무료" in 원가:
-            return "0%"
         o = int(re.sub(r"[₩,\s]", "", 원가))
         f = int(re.sub(r"[₩,\s]", "", 할인가))
         if o > f:
             return f"{round((1 - f / o) * 100)}%"
+        else:
+            return "0%"
     except:
-        pass
-    return "0%"
+        return "정보 없음"
+
 
 def parse_detail_page(url):
     """상세 페이지에서 평점, 리뷰, 장르, 연령, 가격 정보 추출"""
