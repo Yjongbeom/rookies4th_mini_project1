@@ -152,7 +152,7 @@ if __name__ == "__main__":
         print(f"\n총 {len(df)}개의 게임 데이터를 수집했습니다.")
         print("최종 스크래핑 결과 (상위 5개):")
         print(df.head())
-        df.to_csv("directg_games.csv", index=False, encoding='utf-8-sig')
+        df.to_csv("data/directg_games.csv", index=False, encoding='utf-8-sig')
         print("\n'directg_games.csv' 파일로 저장이 완료되었습니다.")
     else:
         print("스크래핑된 데이터가 없습니다.")
