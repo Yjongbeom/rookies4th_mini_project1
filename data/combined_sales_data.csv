@@ -1,112 +1,94 @@
-게임 이름,할인 시작일,플랫폼 이름,할인 지속시간,할인율,원가,할인가,이전과 비교한 할인가격,할인 시작 날짜
-dead-by-daylight,2025-07-30,GameBillet,,64%,27802,9958,-932.0,
-dead-by-daylight,2025-07-30,GameBillet,16 hours,61%,27802,10890,-2865.0,
-dead-by-daylight,2025-07-30,GameBillet,19 minutes,51%,27802,13755,2781.0,
-dead-by-daylight,2025-07-30,GameBillet,39 minutes,61%,27802,10974,-14631.0,
-dead-by-daylight,2025-07-30,Epic Game Store,,60%,24900,9960,-14940.0,
-dead-by-daylight,2025-07-30,Steam,,60%,21500,8600,-12900.0,
-dead-by-daylight,2025-07-29,GreenManGaming,,60%,21500,8600,-12900.0,
-dead-by-daylight,2025-07-29,Microsoft Store,,60%,21500,8600,-12900.0,
-dead-by-daylight,2025-07-23,GameBillet,6 days,8%,27802,25605,-2197.0,
-dead-by-daylight,2025-07-23,GameBillet,19 minutes,0%,27802,27802,2114.0,
-dead-by-daylight,2025-07-22,GameBillet,1 day,8%,27802,25688,-2114.0,
-dead-by-daylight,2025-07-22,GameBillet,19 minutes,0%,27802,27802,2030.0,
-dead-by-daylight,2025-07-18,GameBillet,3 days,7%,27802,25772,-2030.0,
-dead-by-daylight,2025-07-11,GreenManGaming,18 days,0%,21500,21500,12900.0,
-dead-by-daylight,2025-07-11,GameBillet,7 days,0%,27802,27802,NoData,
-dead-by-daylight,2025-07-11,Steam,18 days,0%,21500,21500,12900.0,
-dead-by-daylight,2025-06-28,Epic Game Store,31 days,0%,24900,24900,14940.0,
-dead-by-daylight,2025-06-24,Microsoft Store,34 days,0%,21500,21500,12900.0,
-dead-by-daylight,2025-06-18,Steam,23 days,60%,21500,8600,-12900.0,
-dead-by-daylight,2025-06-18,GreenManGaming,23 days,60%,21500,8600,-12900.0,
-dead-by-daylight,2025-06-18,Epic Game Store,10 days,60%,24900,9960,-14940.0,
-dead-by-daylight,2025-06-10,Microsoft Store,14 days,60%,21500,8600,-12900.0,
-dead-by-daylight,2025-05-17,Epic Game Store,31 days,0%,24900,24900,14940.0,
-dead-by-daylight,2025-05-10,Epic Game Store,7 days,60%,24900,9960,-14940.0,
-dead-by-daylight,2025-04-16,Steam,2 months,0%,21500,21500,12900.0,
-dead-by-daylight,2025-04-10,Epic Game Store,30 days,0%,24900,24900,14940.0,
-dead-by-daylight,2025-04-08,Microsoft Store,2 months,0%,21500,21500,12900.0,
-dead-by-daylight,2025-04-03,Steam,12 days,60%,21500,8600,-12900.0,
-dead-by-daylight,2025-04-01,Microsoft Store,7 days,60%,21500,8600,-12900.0,
-dead-by-daylight,2025-03-27,Epic Game Store,13 days,60%,24900,9960,-14940.0,
-dead-by-daylight,2025-03-21,Steam,12 days,0%,21500,21500,12900.0,
-dead-by-daylight,2025-03-14,Steam,6 days,60%,21500,8600,-12900.0,
-dead-by-daylight,2025-02-25,Steam,17 days,0%,21500,21500,12900.0,
-grounded-2,2025-07-30,Steam,,0%,34800,34800,NoData,
-grounded-2,2025-07-30,Microsoft Store,,0%,34800,34800,NoData,
-,,Steam,,0%,2300,2300,1150.0,2025-07-11
-,,Steam,12 days,50%,2300,1150,-1150.0,2025-06-28
-,,Steam,3 months,0%,2300,2300,920.0,2025-03-16
-,,Steam,14 days,40%,2300,1380,NoData,2025-03-02
-,,GameBillet,,16%,69624,58398,-2870,2025-07-30
-,,GameBillet,19 minutes,12%,69624,61268,2786,2025-07-30
-,,Gamer Thor,,16%,69624,58412,-11212,2025-07-30
-,,GameBillet,1 hour,16%,69624,58482,9749,2025-07-30
-,,AllYouPlay,,13%,69624,60710,-8914,2025-07-29
-,,PlanetPlay,,0%,68405,68405,34202,2025-07-29
-,,GameBillet,4 days,30%,69624,48733,18817,2025-07-26
-,,GreenManGaming,,0%,53000,53000,26500,2025-07-26
-,,Noctre,,0%,69624,69624,35501,2025-07-26
-,,AllYouPlay,3 days,0%,69624,69624,39234,2025-07-26
-,,WinGameStore,,0%,69624,69624,34819,2025-07-26
-,,Gamer Thor,4 days,0%,69624,69624,36212,2025-07-26
-,,Humble Store,,0%,69624,69624,34819,2025-07-26
-,,Gamer Thor,10 hours,52%,69624,33412,3482,2025-07-25
-,,GameBillet,1 day,57%,69624,29916,-2925,2025-07-24
-,,GameBillet,19 minutes,53%,69624,32841,2785,2025-07-24
-,,Gamer Thor,21 hours,57%,69624,29930,4039,2025-07-24
-,,Gamer Thor,2 hours,63%,69624,25891,-4179,2025-07-24
-,,GameBillet,3 hours,57%,69624,30056,4095,2025-07-24
-,,GameBillet,39 minutes,63%,69624,25961,-4178,2025-07-24
-,,Gamer Thor,2 hours,57%,69624,30070,-4735,2025-07-24
-,,Gamer Thor,11 hours,50%,69624,34805,4652,2025-07-24
-,,GameBillet,17 hours,57%,69624,30139,-2869,2025-07-23
-,,GameBillet,19 minutes,53%,69624,33008,2785,2025-07-23
-,,Gamer Thor,20 hours,57%,69624,30153,-39471,2025-07-23
-,,Gamer Thor,59 minutes,0%,69624,69624,39387,2025-07-23
-,,IndieGala Store,,0%,69624,69624,34819,2025-07-21
-,,GameBillet,4 days,57%,69624,30223,-2869,2025-07-19
-,,GameBillet,20 minutes,52%,69624,33092,2786,2025-07-19
-,,Gamer Thor,3 days,57%,69624,30237,-83,2025-07-19
-,,GameBillet,1 hour,56%,69624,30306,-1992,2025-07-19
-,,Gamer Thor,5 hours,56%,69624,30320,-1992,2025-07-19
-,,AllYouPlay,7 days,56%,69624,30390,-39234,2025-07-18
-,,AllYouPlay,,0%,83552,83552,75195,2025-07-31
-,,GameBillet,,17%,83552,69318,-14234,2025-07-31
-,,IndieGala Store,,0%,83552,83552,75209,2025-07-31
-,,GameBillet,20 minutes,0%,83552,83552,76115,2025-07-31
-,,Humble Store,,0%,83552,83552,75209,2025-07-31
-,,Noctre,,0%,83552,83552,75265,2025-07-30
-,,GamersGate,,0%,65000,65000,58500,2025-07-27
-,,GreenManGaming,,95%,65000,3000,-2900,2025-07-26
-,,GreenManGaming,few seconds,91%,65000,5900,-59100,2025-07-26
-,,GamersGate,1 day,90%,65000,6500,-58500,2025-07-25
-,,GamersGate,few seconds,0%,65000,65000,58500,2025-07-25
-,,Humble Store,5 days,90%,83552,8343,4179,2025-07-25
-,,GameBillet,7 days,91%,83552,7437,-920,2025-07-24
-,,IndieGala Store,7 days,90%,83552,8343,4179,2025-07-23
-,,GameBillet,15 hours,90%,83552,8357,-60961,2025-07-23
-,,GamersGate,1 day,90%,65000,6500,-58500,2025-07-23
-,,Noctre,7 days,90%,83552,8287,-75265,2025-07-23
-,,AllYouPlay,7 days,90%,83552,8357,-75195,2025-07-23
-,,GreenManGaming,6 days,0%,65000,65000,59100,2025-07-19
-,,2game,,0%,65000,65000,61750,2025-07-18
-,,WinGameStore,,95%,83552,3872,-2103,2025-07-18
-,,MacGameStore,,95%,83552,3872,-292,2025-07-18
-,,WinGameStore,1 hour,93%,83552,5975,2437,2025-07-18
-,,Humble Store,6 days,95%,83552,4164,-79388,2025-07-18
-,,GamesPlanet US,,10%,83552,75195,66852,2025-07-18
-,,Epic Game Store,,90%,65000,6500,-58500,2025-07-18
-,,MacGameStore,11 hours,95%,83552,4164,-79388,2025-07-17
-,,Dreamgame,,0%,65000,65000,58500,2025-07-17
-,,Microsoft Store,,80%,34000,6800,-27200,2025-07-17
-,,GreenManGaming,4 days,91%,65000,5900,-59100,2025-07-14
-,,AllYouPlay,10 days,0%,83552,83552,79374,2025-07-13
-,,GameBillet,10 days,17%,83552,69318,62034,2025-07-13
-,,Fanatical,,0%,83552,83552,79388,2025-07-13
-,,GamersGate,10 days,0%,65000,65000,62010,2025-07-13
-,,Noctre,10 days,0%,83552,83552,79402,2025-07-13
-,,GreenManGaming,3 days,0%,65000,65000,62000,2025-07-11
-,,Steam,,0%,65000,65000,61750,2025-07-11
-,,Dreamgame,8 days,90%,65000,6500,-58500,2025-07-08
-,,Dreamgame,3 hours,0%,65000,65000,58500,2025-07-08
+게임 이름,할인 시작일,플랫폼 이름,할인 지속시간,할인율,원가,할인가,이전과 비교한 할인가격
+dead-by-daylight-the-walking-dead,2025-07-30,Microsoft Store,,0%,8500,8500,NoData
+dead-by-daylight-the-walking-dead,2025-07-30,Epic Game Store,,0%,8500,8500,NoData
+dead-by-daylight-the-walking-dead,2025-07-30,Steam,,0%,8500,8500,NoData
+dead-by-daylight-the-walking-dead,2025-07-30,GreenManGaming,,0%,8500,8500,NoData
+doom-the-dark-ages,2025-07-31,Blizzard,,25%,79900,59925,-19975.0
+doom-the-dark-ages,2025-07-31,Steam,,25%,79800,59850,-19950.0
+doom-the-dark-ages,2025-07-31,Fanatical,,37%,97343,61321,-23505.0
+doom-the-dark-ages,2025-07-30,GreenManGaming,,34%,79800,52800,-15100.0
+doom-the-dark-ages,2025-07-30,Microsoft Store,,25%,79900,59925,-19975.0
+doom-the-dark-ages,2025-07-30,GamesPlanet US,,31%,97343,66745,-20863.0
+doom-the-dark-ages,2025-07-30,GamesPlanet DE,,31%,127171,87425,-27027.0
+doom-the-dark-ages,2025-07-30,GamesPlanet FR,,31%,127171,87425,-27027.0
+doom-the-dark-ages,2025-07-30,GamesPlanet UK,,31%,129133,88543,-27675.0
+doom-the-dark-ages,2025-07-15,Fanatical,15 days,13%,97343,84826,-12517.0
+doom-the-dark-ages,2025-07-15,Fanatical,59 minutes,0%,97343,97343,16550.0
+doom-the-dark-ages,2025-06-28,AllYouPlay,,0%,97343,97343,10180.0
+doom-the-dark-ages,2025-04-08,Fanatical,3 months,17%,97343,80793,-973.0
+doom-the-dark-ages,2025-04-01,Blizzard,3 months,0%,79900,79900,NoData
+doom-the-dark-ages,2025-03-18,AllYouPlay,3 months,10%,97343,87163,-306.0
+doom-the-dark-ages,2025-02-19,GreenManGaming,5 months,15%,79800,67900,-11900.0
+doom-the-dark-ages,2025-02-14,GreenManGaming,5 days,0%,79800,79800,NoData
+doom-the-dark-ages,2025-01-24,AllYouPlay,52 days,10%,97343,87469,-9874.0
+doom-the-dark-ages,2025-01-24,AllYouPlay,3 hours,0%,97343,97343,NoData
+doom-the-dark-ages,2025-01-24,Humble Store,,0%,97343,97343,NoData
+doom-the-dark-ages,2025-01-24,Microsoft Store,6 months,0%,79900,79900,NoData
+doom-the-dark-ages,2025-01-24,Fanatical,2 months,16%,97343,81766,NoData
+doom-the-dark-ages,2025-01-24,GamesPlanet DE,6 months,10%,127171,114452,NoData
+doom-the-dark-ages,2025-01-24,GamesPlanet US,6 months,10%,97343,87608,NoData
+doom-the-dark-ages,2025-01-24,GamesPlanet FR,6 months,10%,127171,114452,NoData
+doom-the-dark-ages,2025-01-24,GamesPlanet UK,6 months,10%,129133,116218,NoData
+doom-the-dark-ages,2025-01-24,Steam,6 months,0%,79800,79800,NoData
+grounded-2-founders-pack,2025-07-30,Steam,,0%,10000,10000,NoData
+mage-arena,2025-07-25,Steam,,0%,3400,3400,NoData
+peak,2025-07-11,Steam,,0%,2300,2300,1150.0
+peak,2025-06-28,Steam,12 days,50%,2300,1150,-1150.0
+peak,2025-03-16,Steam,3 months,0%,2300,2300,920.0
+peak,2025-03-02,Steam,14 days,40%,2300,1380,NoData
+rimworld,2025-07-26,Epic Game Store,,0%,37500,37500,7500
+rimworld,2025-07-26,Humble Store,,0%,48665,48665,9736
+rimworld,2025-07-25,GOG,,0%,48665,48665,9736
+rimworld,2025-07-25,Steam,,0%,37500,37500,7500
+rimworld,2025-07-24,Fanatical,,0%,48665,48665,13630
+rimworld,2025-07-11,GOG,13 days,20%,48665,38929,-9736
+rimworld,2025-07-11,Epic Game Store,14 days,20%,37500,30000,-7500
+rimworld,2025-07-11,Fanatical,13 days,28%,48665,35035,-13630
+rimworld,2025-07-11,Humble Store,14 days,20%,48665,38929,-9736
+rimworld,2025-07-11,Fanatical,15 hours,0%,48665,48665,13630
+rimworld,2025-07-10,GOG,1 day,0%,48665,48665,9736
+rimworld,2025-06-27,Steam,27 days,20%,37500,30000,-7500
+rimworld,2025-06-20,Fanatical,20 days,28%,48665,35035,-13630
+rimworld,2025-06-18,GOG,21 days,20%,48665,38929,-9736
+rimworld,2025-06-05,Fanatical,15 days,0%,48665,48665,13630
+rimworld,2025-05-29,Humble Store,43 days,0%,48665,48665,9736
+rimworld,2025-05-22,Epic Game Store,50 days,0%,37500,37500,7500
+rimworld,2025-05-22,Steam,36 days,0%,37500,37500,7500
+rimworld,2025-05-19,Fanatical,16 days,28%,48665,35035,-13630
+rimworld,2025-05-15,Steam,6 days,20%,37500,30000,-7500
+rimworld,2025-05-14,Epic Game Store,7 days,20%,37500,30000,-7500
+rimworld,2025-05-10,Humble Store,19 days,20%,48665,38929,-9736
+rimworld,2025-04-29,GOG,50 days,0%,48665,48665,9736
+rimworld,2025-04-28,Fanatical,21 days,0%,48665,48665,14367
+rimworld,2025-04-25,Humble Store,14 days,0%,48665,48665,9736
+rimworld,2025-04-18,GOG,10 days,20%,48665,38929,-9736
+rimworld,2025-04-18,Humble Store,7 days,20%,48665,38929,-9736
+rimworld,2025-04-15,Fanatical,12 days,30%,48665,34298,-737
+rimworld,2025-04-14,Fanatical,1 day,28%,48665,35035,-13630
+rimworld,2025-04-10,Epic Game Store,34 days,0%,37500,37500,7500
+rimworld,2025-04-08,Steam,37 days,0%,37500,37500,7500
+rimworld,2025-04-03,GOG,15 days,0%,48665,48665,9736
+rimworld,2025-03-28,Humble Store,20 days,0%,48665,48665,9736
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-31,PlanetPlay,,10%,47879,43091,7541.0
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-31,GreenManGaming,,15%,39500,33500,-1100.0
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,GameBillet,,24%,48665,37093,-2865.0
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,GameBillet,20 minutes,18%,48665,39958,2781.0
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,IndieGala Store,,10%,48665,43797,NoData
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,JoyBuggy,,10%,48665,43560,NoData
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,Gamer Thor,,0%,39500,39500,NoData
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,2game,,14%,39500,34128,NoData
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,GameBillet,16 hours,24%,48665,37177,-2809.0
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,GameBillet,39 minutes,18%,48665,39986,2782.0
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,GameBillet,1 hour,24%,48665,37204,-2198.0
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,PlanetPlay,1 day,10%,39500,35550,NoData
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,Nuuvem,,10%,48665,43797,NoData
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,WinGameStore,,12%,48665,42962,NoData
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,GamersGate,,10%,39500,35550,-3950.0
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,GameBillet,1 hour,19%,48665,39402,-4395.0
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,Playsum,,10%,48665,43797,-4868.0
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,GamersGate,48 minutes,0%,39500,39500,NoData
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,GreenManGaming,1 day,12%,39500,34600,-4900.0
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,GameBillet,42 minutes,10%,48665,43797,NoData
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-30,Steam,,10%,39500,35550,NoData
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-29,Playsum,3 hours,0%,48665,48665,NoData
+tales-of-the-shire-a-the-lord-of-the-rings-game,2025-07-28,GreenManGaming,1 day,0%,39500,39500,NoData
