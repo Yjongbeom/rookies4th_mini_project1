@@ -7,7 +7,7 @@ import time
 def scrape_all_directg_games():
     """
     다이렉트 게임즈의 모든 페이지를 순회하며,
-    상세 페이지의 영문 제목을 포함한 최종 데이터를 스크래핑하는 함수
+    DLC를 제외하고 상세 페이지의 정보를 포함한 최종 데이터를 스크래핑하는 함수 (최종본)
     """
     base_url = "https://directg.net/game/game.html"
     game_data_list = []
@@ -23,15 +23,12 @@ def scrape_all_directg_games():
         last_page = 1 # 기본값
         pagination = soup.find('ul', class_='pagination')
         if pagination:
-            # 페이지네이션 링크들을 모두 찾습니다.
             page_links = pagination.find_all('a')
             for link in page_links:
-                # 링크의 텍스트가 'Last »'인 것을 찾습니다.
                 if link.get_text(strip=True) == 'Last »':
                     last_page_href = link['href']
-                    # href에서 숫자 부분만 추출합니다.
                     last_page = int(last_page_href.split('page=')[-1])
-                    break # 찾았으면 루프 종료
+                    break
         
         print(f"최종 페이지: {last_page} 페이지")
     except Exception as e:
@@ -55,7 +52,7 @@ def scrape_all_directg_games():
                 break
 
             for item in game_items:
-                # --- 1단계: 목록 페이지에서 기본 정보 및 URL 추출 ---
+                # 1단계: 목록 페이지에서 기본 정보 및 URL 추출
                 temp_title_tag = item.find('h2', itemprop='name')
                 temp_title = temp_title_tag['content'] if temp_title_tag else '제목 없음'
                 
@@ -64,7 +61,7 @@ def scrape_all_directg_games():
                 if site_url_tag and 'href' in site_url_tag.attrs:
                     site_url = urljoin(base_url, site_url_tag['href'])
 
-                # --- 2단계: 상세 페이지 접속하여 최종 데이터 추출 ---
+                # 2단계: 상세 페이지 접속하여 최종 데이터 추출
                 game_title, genre, age_rating = temp_title, '정보 없음', '정보 없음'
                 
                 if site_url != 'URL 없음':
@@ -73,12 +70,18 @@ def scrape_all_directg_games():
                         detail_response.encoding = 'utf-8'
                         detail_soup = BeautifulSoup(detail_response.text, 'html.parser')
                         
-                        # --- 상세 페이지에서 영문 제목 추출 ---
+                        # --- DLC 게임인지 확인하는 최종 로직 ---
+                        short_desc_div = detail_soup.find('div', class_='product-short-description')
+                        if short_desc_div and "기본 게임이 필요합니다" in short_desc_div.get_text():
+                            print(f"  - DLC 게임으로 판단되어 건너뜁니다: {temp_title}")
+                            continue 
+                        # --- DLC 확인 로직 끝 ---
+                        
+                        # 영문 제목, 장르, 연령 등급 추출
                         title_span_tag = detail_soup.select_one('h1 span[style="text-transform:none"]')
                         if title_span_tag:
                             game_title = title_span_tag.get_text(strip=True)
                         
-                        # 장르 및 연령 등급 추출
                         info_section = detail_soup.find('div', class_='product-info')
                         if info_section:
                             genre_desc_tag = info_section.find('span', class_='vm-desc', string='장르 ')
@@ -93,10 +96,12 @@ def scrape_all_directg_games():
                                 elif 'age_12' in img_src: age_rating = '12세 이용가'
                                 elif 'age_15' in img_src: age_rating = '15세 이용가'
                                 elif 'age_19' in img_src: age_rating = '19세 이용가'
+
                     except requests.exceptions.RequestException as detail_e:
                         print(f"'{temp_title}' 상세 페이지 접속 실패: {detail_e}")
+                        continue
 
-                # --- 3단계: 목록 페이지에서 나머지 정보 추출 ---
+                # 3단계: 목록 페이지에서 나머지 정보 추출
                 platform_name = '플랫폼 정보 없음'
                 platform_img = item.select_one('div[style*="display:block"] img')
                 if platform_img and 'src' in platform_img.attrs:
@@ -153,6 +158,6 @@ if __name__ == "__main__":
         print("최종 스크래핑 결과 (상위 5개):")
         print(df.head())
         df.to_csv("data/directg_games_data.csv", index=False, encoding='utf-8-sig')
-        print("\n'directg_games_data.csv' 파일로 저장이 완료되었습니다.")
+        print("\n'data/directg_games_data.csv' 파일로 저장이 완료되었습니다.")
     else:
         print("스크래핑된 데이터가 없습니다.")
