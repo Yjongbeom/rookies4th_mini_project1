@@ -94,28 +94,38 @@ if st.session_state.page == '대시보드':
 
     left_col, right_col = st.columns([2, 1])
     with right_col:
-        st.subheader("최근 할인 게임 TOP 10")
+        # [수정] 제목 변경
+        st.subheader("할인 중인 게임 TOP 10")
+        
+        # [수정] 할인율이 0보다 큰 게임만 필터링
+        numeric_discounts = pd.to_numeric(df['할인율'].astype(str).str.replace('%', ''), errors='coerce').fillna(0)
+        discounted_games_df = df[numeric_discounts > 0].head(10)
+
         with st.container(border=True):
-            for index, row in df.head(10).iterrows():
-                img_col, info_col, price_col = st.columns([1, 3, 1.5])
-                with img_col: 
-                    st.image(row['이미지 URL'], use_container_width=True)
-                with info_col:
-                    st.markdown(f"**{row['게임 이름']}**")
-                    st.caption(f"플랫폼: {row['플랫폼 이름']}")
-                with price_col:
-                    discount_html, price_html = "", ""
-                    discount_num = pd.to_numeric(str(row['할인율']).replace('%', ''), errors='coerce')
-                    if pd.notna(discount_num) and discount_num > 0:
-                        discount_html = f'<span style="background-color: #d43f3a; color: white; border-radius: 5px; padding: 3px 8px; font-weight: bold; font-size: 0.9em;">-{int(discount_num)}%</span>'
-                    original_price_display = format_display_price(row['원가'])
-                    sales_price_display = format_display_price(row['할인가'])
-                    if original_price_display != sales_price_display and '품절' not in sales_price_display:
-                        price_html = f'<div style="text-align: right;"><span style="font-size: 0.8em; color: grey;"><del>{original_price_display}</del></span><br><strong style="font-size: 1.2em;">{sales_price_display}</strong></div>'
-                    else:
-                        price_html = f'<div style="text-align: right; font-size: 1.2em; font-weight: bold;">{sales_price_display}</div>'
-                    final_html = f'<div style="display: flex; justify-content: flex-end; align-items: center; gap: 15px; height: 100%;">{discount_html}{price_html}</div>'
-                    st.markdown(final_html, unsafe_allow_html=True)
+            if discounted_games_df.empty:
+                st.info("현재 할인 중인 게임이 없습니다.")
+            else:
+                # [수정] 필터링된 데이터프레임으로 반복
+                for index, row in discounted_games_df.iterrows():
+                    img_col, info_col, price_col = st.columns([1, 3, 1.5])
+                    with img_col: 
+                        st.image(row['이미지 URL'], use_container_width=True)
+                    with info_col:
+                        st.markdown(f"**{row['게임 이름']}**")
+                        st.caption(f"플랫폼: {row['플랫폼 이름']}")
+                    with price_col:
+                        discount_html, price_html = "", ""
+                        discount_num = pd.to_numeric(str(row['할인율']).replace('%', ''), errors='coerce')
+                        if pd.notna(discount_num) and discount_num > 0:
+                            discount_html = f'<span style="background-color: #d43f3a; color: white; border-radius: 5px; padding: 3px 8px; font-weight: bold; font-size: 0.9em;">-{int(discount_num)}%</span>'
+                        original_price_display = format_display_price(row['원가'])
+                        sales_price_display = format_display_price(row['할인가'])
+                        if original_price_display != sales_price_display and '품절' not in sales_price_display:
+                            price_html = f'<div style="text-align: right;"><span style="font-size: 0.8em; color: grey;"><del>{original_price_display}</del></span><br><strong style="font-size: 1.2em;">{sales_price_display}</strong></div>'
+                        else:
+                            price_html = f'<div style="text-align: right; font-size: 1.2em; font-weight: bold;">{sales_price_display}</div>'
+                        final_html = f'<div style="display: flex; justify-content: flex-end; align-items: center; gap: 15px; height: 100%;">{discount_html}{price_html}</div>'
+                        st.markdown(final_html, unsafe_allow_html=True)
 
 elif st.session_state.page == '전체 데이터 보기':
     filter_col, list_col = st.columns([1, 3])
@@ -137,9 +147,7 @@ elif st.session_state.page == '전체 데이터 보기':
         if selected_platforms:
             filtered_df = filtered_df[filtered_df['플랫폼 이름'].isin(selected_platforms)]
         
-        # [수정] 장르 검색 로직: AND 조건으로 변경
         if selected_genres:
-            # 선택된 모든 장르가 포함되어야 하므로, 각 장르에 대해 순차적으로 필터링
             for genre in selected_genres:
                 filtered_df = filtered_df[filtered_df['장르'].str.contains(re.escape(genre), case=False, na=False)]
         
@@ -221,7 +229,7 @@ elif st.session_state.page == '게임 상세':
                 price_html = f'<div style="text-align: left; font-size: 1.8em; font-weight: bold;">{sales_price_display}</div>'
             
             final_price_html = f'<div style="display: flex; justify-content: flex-start; align-items: center; gap: 15px; height: 100%;">{price_html}{discount_html}</div>'
-            st.markdown(final_price_html, unsafe_allow_html=True)
+            st.markdown(final_html, unsafe_allow_html=True)
             
             st.subheader(" ")
             st.info("게임 설명란 (추후 데이터 추가 시 표시됩니다.)")
