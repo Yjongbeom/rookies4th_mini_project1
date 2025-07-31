@@ -2,7 +2,7 @@ import pandas as pd
 
 # CSV 파일 경로 설정
 INPUT_FILE = "../data/steam_detailed_data.csv"
-OUTPUT_FILE = "../data/steam_filtered_data.csv"
+OUTPUT_FILE = "../data/steam_games_data.csv"
 
 # CSV 파일 불러오기
 df = pd.read_csv(INPUT_FILE)
