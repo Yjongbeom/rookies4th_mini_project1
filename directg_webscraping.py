@@ -4,6 +4,17 @@ import pandas as pd
 from urllib.parse import urljoin
 import time
 
+# --- 가격 형식을 통일하는 함수 추가 --- #
+def format_price(price_text):
+    """가격 문자열에서 불필요한 기호(₩, \, 원)와 공백을 제거하고, 맨 앞에 ₩를 붙여 반환합니다."""
+    if isinstance(price_text, str):
+        cleaned_price = price_text.replace('₩', '').replace('\\', '').replace('원', '').strip()
+        # 숫자 형태인 경우에만 ₩ 기호를 붙여서 반환
+        if cleaned_price.isdigit():
+            return f"₩ {cleaned_price}"
+    # 문자열이 아니거나 숫자가 아닌 경우(예: '품절')는 그대로 반환
+    return price_text
+
 def scrape_all_directg_games():
     """
     다이렉트 게임즈의 모든 페이지를 순회하며,
@@ -124,6 +135,9 @@ def scrape_all_directg_games():
                 else:
                     original_price = sales_price
                     discount_rate = '0%'
+
+                original_price = format_price(original_price)
+                sales_price = format_price(sales_price)
                 
                 print(f"  - 처리 완료: {game_title}")
                 game_data_list.append({
@@ -142,7 +156,7 @@ def scrape_all_directg_games():
         
         except Exception as e:
             print(f"{page_num} 페이지 처리 중 오류 발생: {e}")
-            continue
+            continue 
 
         time.sleep(1)
 
