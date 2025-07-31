@@ -123,16 +123,16 @@ def scrape_all_directg_games():
                 print(f"  - 처리 완료: {game_title}")
                 game_data_list.append({
                     "게임 이름": game_title,
-                    "플랫폼 이름": platform_name,
-                    "이미지": image_url,
                     "원가": original_price,
-                    "할인율": discount_rate,
                     "할인가": sales_price,
-                    "장르": genre,
-                    "연령 등급": age_rating,
+                    "사이트 URL": site_url,
+                    "할인율": discount_rate,
                     "유저 평점": None, 
                     "유저 리뷰": None,
-                    "사이트 URL": site_url
+                    "플랫폼 이름": platform_name,
+                    "이미지": image_url,
+                    "장르": genre,
+                    "연령 등급": age_rating,
                 })
         
         except Exception as e:
@@ -152,7 +152,7 @@ if __name__ == "__main__":
         print(f"\n총 {len(df)}개의 게임 데이터를 수집했습니다.")
         print("최종 스크래핑 결과 (상위 5개):")
         print(df.head())
-        df.to_csv("data/directg_games.csv", index=False, encoding='utf-8-sig')
-        print("\n'directg_games.csv' 파일로 저장이 완료되었습니다.")
+        df.to_csv("data/directg_games_data.csv", index=False, encoding='utf-8-sig')
+        print("\n'directg_games_data.csv' 파일로 저장이 완료되었습니다.")
     else:
         print("스크래핑된 데이터가 없습니다.")
