@@ -13,6 +13,10 @@ def load_data(path):
     if '장르' not in df.columns:
         df['장르'] = '기타'
     df['장르'] = df['장르'].fillna('기타').astype(str)
+    # 사이트 URL 컬럼이 없을 경우를 대비
+    if '사이트 URL' not in df.columns:
+        df['사이트 URL'] = ''
+    df['사이트 URL'] = df['사이트 URL'].fillna('')
     return df
 
 # --- 헬퍼 함수 ---
@@ -53,7 +57,6 @@ if 'selected_game_id' not in st.session_state:
 
 # --- 페이지 전환 함수 ---
 def set_page():
-    # on_change 콜백은 위젯의 key를 통해 새 값에 접근합니다.
     st.session_state.page = st.session_state.page_selector
 
 def view_detail(game_id):
@@ -94,10 +97,8 @@ if st.session_state.page == '대시보드':
 
     left_col, right_col = st.columns([2, 1])
     with right_col:
-        # [수정] 제목 변경
         st.subheader("할인 중인 게임 TOP 10")
         
-        # [수정] 할인율이 0보다 큰 게임만 필터링
         numeric_discounts = pd.to_numeric(df['할인율'].astype(str).str.replace('%', ''), errors='coerce').fillna(0)
         discounted_games_df = df[numeric_discounts > 0].head(10)
 
@@ -105,7 +106,6 @@ if st.session_state.page == '대시보드':
             if discounted_games_df.empty:
                 st.info("현재 할인 중인 게임이 없습니다.")
             else:
-                # [수정] 필터링된 데이터프레임으로 반복
                 for index, row in discounted_games_df.iterrows():
                     img_col, info_col, price_col = st.columns([1, 3, 1.5])
                     with img_col: 
@@ -221,15 +221,93 @@ elif st.session_state.page == '게임 상세':
             discount_num = pd.to_numeric(str(game_data['할인율']).replace('%', ''), errors='coerce')
             if pd.notna(discount_num) and discount_num > 0:
                 discount_html = f'<span style="background-color: #d43f3a; color: white; border-radius: 5px; padding: 3px 8px; font-weight: bold; font-size: 0.9em;">-{int(discount_num)}%</span>'
+            
             original_price_display = format_display_price(game_data['원가'])
             sales_price_display = format_display_price(game_data['할인가'])
+            
             if original_price_display != sales_price_display and '품절' not in sales_price_display:
                 price_html = f'<div style="text-align: left;"><span style="font-size: 1.1em; color: grey;"><del>{original_price_display}</del></span><br><strong style="font-size: 1.8em; color: #d43f3a;">{sales_price_display}</strong></div>'
             else:
                 price_html = f'<div style="text-align: left; font-size: 1.8em; font-weight: bold;">{sales_price_display}</div>'
             
             final_price_html = f'<div style="display: flex; justify-content: flex-start; align-items: center; gap: 15px; height: 100%;">{price_html}{discount_html}</div>'
-            st.markdown(final_html, unsafe_allow_html=True)
+            st.markdown(final_price_html, unsafe_allow_html=True)
             
             st.subheader(" ")
             st.info("게임 설명란 (추후 데이터 추가 시 표시됩니다.)")
+
+        # --- 사이트별 가격 비교 ---
+        st.markdown("---")
+        st.subheader("🛍️ 사이트별 가격 비교")
+
+        game_name = game_data['게임 이름']
+        related_games = df[df['게임 이름'] == game_name]
+
+        stores_data = {
+            'steam': None, 'directg': None, 'epicgames': None, 'greenmangaming': None
+        }
+        for _, row in related_games.iterrows():
+            url = str(row.get('사이트 URL', '')).lower()
+            # [수정] Direct Games URL에 'steam'이 포함된 경우를 대비해, 더 명확한 도메인으로 스토어를 구분하여 버그를 해결합니다.
+            if 'directg.net' in url:
+                stores_data['directg'] = row
+            elif 'store.steampowered.com' in url:
+                stores_data['steam'] = row
+            # elif 'epicgames.com' in url:
+            #     stores_data['epicgames'] = row
+            # elif 'greenmangaming.com' in url:
+            #     stores_data['greenmangaming'] = row
+
+        store_display_names = {
+            'steam': 'Steam', 'directg': 'Direct Games', 
+            'epicgames': 'Epic Games', 'greenmangaming': 'Green Man Gaming'
+        }
+
+        for store_key, store_name in store_display_names.items():
+            store_data = stores_data.get(store_key)
+            
+            with st.container(border=True):
+                if store_data is not None:
+                    original = format_display_price(store_data['원가'])
+                    sales = format_display_price(store_data['할인가'])
+                    discount_num = pd.to_numeric(str(store_data['할인율']).replace('%', ''), errors='coerce')
+                    url = store_data['사이트 URL']
+
+                    price_html = ""
+                    if original != sales and '품절' not in sales:
+                        price_html = f"<div style='text-align: right;'><span style='font-size: 0.9em; color: grey; text-decoration: line-through;'>{original}</span><br><strong style='font-size: 1.2em;'>{sales}</strong></div>"
+                    else:
+                        price_html = f"<div style='text-align: right; font-size: 1.2em; font-weight: bold;'>{sales}</div>"
+
+                    discount_badge = ""
+                    if pd.notna(discount_num) and discount_num > 0:
+                        discount_badge = f"<span style='background-color: #d43f3a; color: white; border-radius: 5px; padding: 2px 6px; font-size: 0.8em; font-weight: bold;'>-{int(discount_num)}%</span>"
+                    
+                    list_item_html = f"""
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <div style="flex-grow: 1;"><strong style="font-size: 1.1em;">{store_name}</strong></div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            {discount_badge}
+                            {price_html}
+                            <a href="{url}" target="_blank" style="text-decoration: none; color: white;">
+                                <button style="background-color: #5B7C99; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">
+                                    구매하기
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                    """
+                    st.markdown(list_item_html, unsafe_allow_html=True)
+                else:
+                    list_item_html = f"""
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; opacity: 0.5;">
+                        <div style="flex-grow: 1;"><strong style="font-size: 1.1em;">{store_name}</strong></div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <span style="color: grey;">데이터 없음</span>
+                            <button disabled style="background-color: grey; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: not-allowed;">
+                                구매하기
+                            </button>
+                        </div>
+                    </div>
+                    """
+                    st.markdown(list_item_html, unsafe_allow_html=True)
