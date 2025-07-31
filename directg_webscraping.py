@@ -109,7 +109,7 @@ def scrape_all_directg_games():
                 image_url = image_tag['src'] if image_tag else '이미지 없음'
                 
                 sales_price_tag = item.find('span', class_='PricesalesPrice', itemprop='price')
-                sales_price = sales_price_tag.get_text(strip=True) if sales_price_tag else '가격 정보 없음'
+                sales_price = sales_price_tag.get_text(strip=True) if sales_price_tag else '품절'
 
                 base_price_tag = item.find('span', class_='PricebasePrice')
                 if base_price_tag and base_price_tag.get_text(strip=True):
@@ -118,7 +118,7 @@ def scrape_all_directg_games():
                     discount_rate = discount_rate_tag.get_text(strip=True) if discount_rate_tag else '0%'
                 else:
                     original_price = sales_price
-                    discount_rate = '할인 없음'
+                    discount_rate = '0%'
                 
                 print(f"  - 처리 완료: {game_title}")
                 game_data_list.append({
