@@ -35,7 +35,7 @@ def format_display_price(price_string):
         return f"₩{int(price_num):,}"
     except (ValueError, TypeError):
         return price_str
-
+# ------------------------------------------------------------<'이부분'
 def clean_game_name_final(name):
     """
     게임 이름 문자열을 최종 클리닝하는 함수:
@@ -114,7 +114,7 @@ def visualize(game_data):
                       legend_title_text='범례')
 
     return fig
-
+# ------------------------------------------------------------<'여기까지'
 # --- 데이터 로드 ---
 try:
     df = load_data("merged_games_data.csv")
@@ -161,6 +161,7 @@ st.radio(
 
 # --- 페이지 렌더링 ---
 if st.session_state.page == '대시보드':
+    # ------------------------------------------------------------<'이부분'
     # 그래프와 게임 목록을 위한 2단 레이아웃
     left_col, right_col = st.columns([2, 1])
 
@@ -260,7 +261,7 @@ if st.session_state.page == '대시보드':
                      color_continuous_scale='Cividis_r') #색깔 선택 가능Blues,Greens,Reds,Purples,Oranges,PuBu,YlGnBu,Viridis,Plasma,Inferno,Magma,Cividis
         fig4.update_layout(yaxis={'categoryorder':'total ascending'})
         st.plotly_chart(fig4, use_container_width=True)
-
+# ------------------------------------------------------------<'여기까지/밑에 righ_col 부분이 추가가 되었을 것 같아서 확인해주세요'
     with right_col:
         st.subheader("할인 중인 게임 TOP 10")
         
@@ -471,7 +472,7 @@ elif st.session_state.page == '게임 상세':
                     </div>
                     """
                     st.markdown(list_item_html, unsafe_allow_html=True)
-        
+        # ------------------------------------------------------------<'이부분'
         # --- 가격 추이 그래프 ---
         st.markdown("---")
         st.subheader("📈 가격 추이")
@@ -489,3 +490,4 @@ elif st.session_state.page == '게임 상세':
             st.plotly_chart(fig, use_container_width=True)
         else:
             st.info("해당 게임의 가격 추이 데이터가 없습니다.")
+            # ------------------------------------------------------------<'여기까지부분'
