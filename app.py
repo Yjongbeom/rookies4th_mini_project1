@@ -176,7 +176,7 @@ if st.session_state.page == '대시보드':
                 st.info("현재 할인 중인 게임이 없습니다.")
             else:
                 for index, row in discounted_games_df.iterrows():
-                    img_col, info_col, price_col, btn_col = st.columns([1, 3, 1.5, 1])
+                    img_col, info_col, price_col, btn_col = st.columns([2, 3, 2, 1.8])
                     
                     with img_col:
                         st.image(row['이미지 URL'], use_container_width=True)
