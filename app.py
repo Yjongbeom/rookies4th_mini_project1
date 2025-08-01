@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import re
+import plotly.express as px
+import plotly.graph_objects as go
 
 # --- HTML 태그 제거 함수 ---
 def remove_html_tags(text):
@@ -10,6 +12,86 @@ def remove_html_tags(text):
         clean = re.sub(r'\s+', ' ', clean).strip()
         return clean
     return str(text)
+
+def clean_game_name_final(name):
+    """
+    게임 이름 문자열을 최종 클리닝하는 함수:
+    - 모두 소문자로 변환
+    - '&'를 'and'로 변환
+    - 띄어쓰기를 하이픈으로 변환
+    - 영어 소문자, 숫자, 하이픈 외 모든 문자 제거
+    - 연속된 하이픈 합치기 및 불필요한 하이픈 제거
+    """
+    # 0. 입력값이 NaN일 경우 빈 문자열로 처리
+    if pd.isna(name):
+        return ""
+        
+    # 문자열로 변환하고 모두 소문자로 변경
+    cleaned_name = str(name).lower()
+
+    # 1. '&' 기호를 'and'로 변환 (먼저 처리)
+    cleaned_name = cleaned_name.replace('&', 'and')
+
+    # 2. 띄어쓰기(' ')를 하이픈('-')으로 변환
+    cleaned_name = cleaned_name.replace(' ', '-')
+
+    # 3. 영어 소문자, 숫자, 하이픈('-')을 제외한 모든 문자 제거
+    cleaned_name = re.sub(r'[^a-z0-9-]', '', cleaned_name)
+
+    # 4. 연속으로 나타나는 하이픈을 하나로 줄이기 (예: 'metal--gear' -> 'metal-gear')
+    cleaned_name = re.sub(r'-+', '-', cleaned_name)
+    
+    # 5. 문장 시작/끝에 불필요하게 붙는 하이픈 제거 (예: '-metal-gear-' -> 'metal-gear')
+    cleaned_name = cleaned_name.strip('-')
+    
+    # 6. 마지막으로, 혹시 남아있을 수 있는 공백 제거 (trim)
+    cleaned_name = cleaned_name.strip()
+
+    return cleaned_name
+
+def visualize(game_data):
+    # '할인 시작일'를 datetime 형식으로 변환
+    game_data = game_data.copy()
+    game_data['할인 시작일'] = pd.to_datetime(game_data['할인 시작일'])
+
+    # 각일별 최저가 및 해당 최저가에 해당하는 모든 데이터 찾기
+    min_price_data = game_data.loc[game_data.groupby('할인 시작일')['할인가'].idxmin()]
+
+    # Plotly를 사용하여 산점도 생성 (최저가 데이터만 사용)
+    # 그래프 색상을 구매하기 버튼 색상인 #5B7C99으로 변경
+    fig = px.scatter(min_price_data,
+                     x='할인 시작일',
+                     y='할인가',
+                     hover_name='플랫폼 이름',
+                     hover_data={
+                         '할인가': ':,'},  # 할인가를 쉼표와 함께 전체 숫자로 표시
+                     title='날짜별 최저 할인가 추이',
+                     labels={'할인 시작일': '할인 시작일', '할인가': '할인가 (원)'},
+                     color_discrete_sequence=['#5B7C99'])
+
+    # 최저가를 나타내는 라인 트레이스 추가
+    # 라인과 마커의 색상을 #5B7C99으로 변경
+    fig.add_trace(
+        go.Scatter(
+            x=min_price_data['할인 시작일'],
+            y=min_price_data['할인가'],
+            mode='lines+markers',
+            name='날짜별 최저 할인가',
+            line=dict(color='#5B7C99', width=2),
+            marker=dict(size=8, symbol='circle', color='#5B7C99'),
+            hovertemplate='<b>날짜:</b> %{x|%Y-%m-%d}<br><b>최저 할인가:</b> %{y:,}원<br><b>플랫폼:</b> %{customdata[0]}<extra></extra>',
+            customdata=min_price_data[['플랫폼 이름']]
+        )
+    )
+
+    # 그래프 레이아웃 업데이트
+    fig.update_layout(xaxis_title="할인 날짜",
+                      yaxis_title="할인가",
+                      xaxis_tickformat='%Y-%m-%d',
+                      yaxis_tickformat=',', # y축 레이블을 쉼표를 포함한 전체 숫자로 표시
+                      legend_title_text='범례')
+
+    return fig
 
 # --- 가격 형식 변환 함수 ---
 def format_display_price(price_string):
@@ -102,9 +184,11 @@ def create_sample_data():
 # --- 데이터 로드 ---
 try:
     df = load_data("data/cleaned_merged_games_data.csv")
+    df_sales = load_data("data/combined_sales_data.csv")
 except FileNotFoundError:
-    st.warning("CSV 파일을 찾을 수 없어 샘플 데이터를 사용합니다.")
-    df = create_sample_data()
+    st.error("오류: 데이터 파일을 찾을 수 없습니다.")
+    st.info("`merged_games_data.csv`와 `combined_sales_data.csv` 파일을 앱과 같은 위치에 넣어주세요.")
+    st.stop()
 
 # --- 데이터에서 모든 고유 장르 추출 ---
 all_genres = sorted(list(df['장르'].str.split(',').explode().str.strip().unique()))
@@ -164,6 +248,103 @@ if st.session_state.page == '대시보드':
     st.markdown("---")
     
     left_col, right_col = st.columns([2, 1])
+
+    with left_col:
+        # 1. 플랫폼별 게임 수 및 평균 할인율 (이중 축 막대 그래프)
+        st.subheader("📊 플랫폼별 게임 수 및 평균 할인율")
+        
+        platform_summary = df.groupby('플랫폼 이름').agg(
+            game_count=('게임 이름', 'count'),
+            avg_discount=('할인율', lambda x: pd.to_numeric(x.astype(str).str.replace('%', ''), errors='coerce').mean())
+        ).reset_index()
+
+        fig1 = go.Figure()
+        fig1.add_trace(go.Bar(
+            x=platform_summary['플랫폼 이름'],
+            y=platform_summary['game_count'],
+            name='게임 수',
+            marker_color='#5B7C99',
+            yaxis='y1'
+        ))
+        fig1.add_trace(go.Scatter(
+            x=platform_summary['플랫폼 이름'],
+            y=platform_summary['avg_discount'],
+            name='평균 할인율',
+            marker_color='#d43f3a',
+            mode='lines+markers',
+            yaxis='y2'
+        ))
+
+        fig1.update_layout(
+            title_text='플랫폼별 게임 수 및 평균 할인율',
+            yaxis=dict(title='게임 수', side='left'),
+            yaxis2=dict(title='평균 할인율 (%)', overlaying='y', side='right'),
+            legend_title_text='범례'
+        )
+        st.plotly_chart(fig1, use_container_width=True)
+
+        # 2. 가격대별 게임 분포 (막대 그래프)
+        st.subheader("💰 가격대별 게임 분포")
+        # '할인가' 컬럼을 숫자로 변환
+        df['numeric_sales_price'] = pd.to_numeric(
+            df['할인가'].astype(str).str.replace('₩', '').str.replace(',', ''), errors='coerce'
+        ).fillna(0)
+        
+        bins = [0, 20000, 40000, 60000, 80000, 100000, float('inf')]
+        labels = ['0-2만원', '2-4만원', '4-6만원', '6-8만원', '8-10만원', '10만원 이상']
+        df['price_range'] = pd.cut(df['numeric_sales_price'], bins=bins, labels=labels, right=False)
+        
+        price_distribution = df['price_range'].value_counts().sort_index()
+        price_distribution_df = price_distribution.reset_index()
+        price_distribution_df.columns = ['price_range', 'count']
+
+        fig2 = px.bar(price_distribution_df, x='price_range', y='count',
+                     title='가격대별 게임 분포',
+                     labels={'price_range': '가격대', 'count': '게임 수'},
+                     color='price_range',
+                     color_discrete_sequence=px.colors.qualitative.Pastel)
+        fig2.update_layout(showlegend=False)
+        st.plotly_chart(fig2, use_container_width=True)
+
+        # 3. 할인율 구간별 게임 분포 (파이 그래프)
+        st.subheader("📉 할인율 구간별 게임 분포")
+        # '할인율' 컬럼을 숫자로 변환
+        df['numeric_discount'] = pd.to_numeric(
+            df['할인율'].astype(str).str.replace('%', ''), errors='coerce'
+        ).fillna(0)
+
+        # 0% 할인은 제외
+        df_discounted = df[df['numeric_discount'] > 0].copy()
+        
+        discount_bins = [0, 20, 40, 60, 80, 101]
+        discount_labels = ['1-20%', '21-40%', '41-60%', '61-80%', '81-100%']
+        df_discounted['discount_range'] = pd.cut(df_discounted['numeric_discount'], bins=discount_bins, labels=discount_labels, right=True)
+        
+        discount_distribution = df_discounted['discount_range'].value_counts().reset_index()
+        discount_distribution.columns = ['discount_range', 'count']
+
+        fig3 = px.pie(discount_distribution, values='count', names='discount_range',
+                      title='할인율 구간별 게임 분포 (0% 제외)',
+                      hole=0.3,
+                      color_discrete_sequence=px.colors.qualitative.Plotly)
+        st.plotly_chart(fig3, use_container_width=True)
+
+        # 4. 장르별 게임 수 (막대 그래프)
+        st.subheader("🕹️ 장르별 게임 수")
+        # '장르' 컬럼의 쉼표로 구분된 문자열을 개별 행으로 분리
+        df_exploded_genres = df.assign(장르=df['장르'].str.split(',')).explode('장르')
+        df_exploded_genres['장르'] = df_exploded_genres['장르'].str.strip()
+        genre_count = df_exploded_genres['장르'].value_counts().head(10).reset_index()
+        genre_count.columns = ['장르', '게임 수']
+        
+        # 색상 스케일을 파란색 계열로 가시성 좋게 변경
+        fig4 = px.bar(genre_count, x='게임 수', y='장르', orientation='h',
+                     title='장르별 게임 수 (TOP 10)',
+                     labels={'게임 수': '게임 수', '장르': '장르'},
+                     color='게임 수',
+                     color_continuous_scale='Cividis_r') #색깔 선택 가능Blues,Greens,Reds,Purples,Oranges,PuBu,YlGnBu,Viridis,Plasma,Inferno,Magma,Cividis
+        fig4.update_layout(yaxis={'categoryorder':'total ascending'})
+        st.plotly_chart(fig4, use_container_width=True)
     
     with right_col:
         st.subheader("할인 중인 게임 TOP 10")
@@ -556,3 +737,20 @@ elif st.session_state.page == '게임 상세':
                             )
                         else:
                             st.markdown("<span style='color: #999;'>-</span>", unsafe_allow_html=True)
+                
+            st.markdown("---")
+            st.subheader("📈 가격 추이")
+            
+            # '게임 이름' 클리닝
+            cleaned_game_name = clean_game_name_final(game_data['게임 이름'])
+
+            # combined_sales_data.csv에서 해당 게임의 데이터 필터링
+            game_sales_data = df_sales[df_sales['게임 이름'] == cleaned_game_name]
+
+            if not game_sales_data.empty:
+                # visualize 함수를 호출하여 그래프 생성
+                fig = visualize(game_sales_data)
+                # Streamlit에 그래프 표시
+                st.plotly_chart(fig, use_container_width=True, key=f"price_chart_{cleaned_game_name}")
+            else:
+                st.info("해당 게임의 가격 추이 데이터가 없습니다.")
