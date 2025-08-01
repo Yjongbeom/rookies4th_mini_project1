@@ -36,7 +36,7 @@ def format_display_price(price_string):
 
 # --- 데이터 로드 ---
 try:
-    df = load_data("data/merged_games_data.csv")
+    df = load_data("data/cleaned_merged_games_data.csv")
 except FileNotFoundError:
     st.error("오류: 'data/merged_games_data.csv' 파일을 찾을 수 없습니다.")
     st.info("app.py 파일과 같은 위치에 'data' 폴더를 만들고, 그 안에 CSV 파일을 넣어주세요.")
