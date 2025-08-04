@@ -726,7 +726,9 @@ def render_game_detail(df, df_sales):
 def main():
     # --- 페이지 설정 ---
     st.set_page_config(layout="wide")
+    st.image("data/icon.png", width=150)
     st.title("🔥 게임 할인 정보 대시보드")
+    
     st.caption("데이터는 웹 스크래핑을 기반으로 수집되었습니다.")
 
     # --- 데이터 로드 ---
