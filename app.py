@@ -603,7 +603,6 @@ def render_game_detail(df, df_sales):
                 st.markdown(final_price_html, unsafe_allow_html=True)
                 
                 st.subheader(" ")
-                st.info("게임 설명란 (추후 데이터 추가 시 표시됩니다.)")
                 
                 # 구매 링크 버튼
                 if game_data['사이트 URL']:
@@ -767,7 +766,7 @@ def main():
         render_full_data(df)
 
     elif st.session_state.page == '게임 상세':
-        render_game_detail(df)
+        render_game_detail(df, df_sales)
 
 # --- 앱 실행 ---
 if __name__ == '__main__':
