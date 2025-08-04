@@ -89,7 +89,8 @@ def visualize(game_data):
                       yaxis_title="할인가",
                       xaxis_tickformat='%Y-%m-%d',
                       yaxis_tickformat=',', # y축 레이블을 쉼표를 포함한 전체 숫자로 표시
-                      legend_title_text='범례')
+                      legend_title_text='범례',
+                      legend=dict(font=dict(size=18)))
 
     return fig
 
@@ -116,9 +117,6 @@ def format_display_price(price_string):
         except (ValueError, TypeError):
             return cleaned
     return cleaned
-
-# --- 페이지 설정 ---
-st.set_page_config(layout="wide")
 
 # --- 데이터 로딩 ---
 @st.cache_data
@@ -181,28 +179,6 @@ def create_sample_data():
     }
     return pd.DataFrame(sample_data)
 
-# --- 데이터 로드 ---
-try:
-    df = load_data("data/cleaned_merged_games_data.csv")
-    df_sales = load_data("data/combined_sales_data.csv")
-except FileNotFoundError:
-    st.error("오류: 데이터 파일을 찾을 수 없습니다.")
-    st.info("`merged_games_data.csv`와 `combined_sales_data.csv` 파일을 앱과 같은 위치에 넣어주세요.")
-    st.stop()
-
-# --- 데이터에서 모든 고유 장르 추출 ---
-all_genres = sorted(list(df['장르'].str.split(',').explode().str.strip().unique()))
-
-# --- 세션 상태 초기화 ---
-if 'page' not in st.session_state:
-    st.session_state.page = '대시보드'
-if 'num_to_display' not in st.session_state:
-    st.session_state.num_to_display = 20
-if 'filtered_df' not in st.session_state:
-    st.session_state.filtered_df = df
-if 'selected_game_id' not in st.session_state:
-    st.session_state.selected_game_id = None
-
 # --- 페이지 전환 함수 ---
 def set_page():
     st.session_state.page = st.session_state.page_selector
@@ -212,23 +188,9 @@ def view_detail(game_id):
     st.session_state.page = '게임 상세'
     st.rerun()
 
-# --- 메인 UI ---
-st.title("🔥 게임 할인 정보 대시보드")
-st.caption("데이터는 웹 스크래핑을 기반으로 수집되었습니다.")
-
-# --- 페이지 메뉴 생성 ---
-st.radio(
-    "메뉴 선택",
-    ['대시보드', '전체 데이터 보기'],
-    key='page_selector',
-    horizontal=True,
-    on_change=set_page
-)
-
-# --- 페이지 렌더링 ---
-if st.session_state.page == '대시보드':
+def render_dashboard(df):
     col1, col2, col3 = st.columns(3)
-    
+        
     with col1:
         with st.container(border=True):
             st.metric(label="총 게임 수", value=f"{df.shape[0]} 개")
@@ -279,7 +241,8 @@ if st.session_state.page == '대시보드':
             title_text='플랫폼별 게임 수 및 평균 할인율',
             yaxis=dict(title='게임 수', side='left'),
             yaxis2=dict(title='평균 할인율 (%)', overlaying='y', side='right'),
-            legend_title_text='범례'
+            legend_title_text='범례',
+            legend=dict(font=dict(size=18))
         )
         st.plotly_chart(fig1, use_container_width=True)
 
@@ -299,10 +262,10 @@ if st.session_state.page == '대시보드':
         price_distribution_df.columns = ['price_range', 'count']
 
         fig2 = px.bar(price_distribution_df, x='price_range', y='count',
-                     title='가격대별 게임 분포',
-                     labels={'price_range': '가격대', 'count': '게임 수'},
-                     color='price_range',
-                     color_discrete_sequence=px.colors.qualitative.Pastel)
+                    title='가격대별 게임 분포',
+                    labels={'price_range': '가격대', 'count': '게임 수'},
+                    color='price_range',
+                    color_discrete_sequence=px.colors.qualitative.Pastel)
         fig2.update_layout(showlegend=False)
         st.plotly_chart(fig2, use_container_width=True)
 
@@ -324,9 +287,10 @@ if st.session_state.page == '대시보드':
         discount_distribution.columns = ['discount_range', 'count']
 
         fig3 = px.pie(discount_distribution, values='count', names='discount_range',
-                      title='할인율 구간별 게임 분포 (0% 제외)',
-                      hole=0.3,
-                      color_discrete_sequence=px.colors.qualitative.Plotly)
+                    title='할인율 구간별 게임 분포 (0% 제외)',
+                    hole=0.3,
+                    color_discrete_sequence=px.colors.qualitative.Plotly)
+        fig3.update_layout(legend=dict(font=dict(size=18)))
         st.plotly_chart(fig3, use_container_width=True)
 
         # 4. 장르별 게임 수 (막대 그래프)
@@ -339,11 +303,15 @@ if st.session_state.page == '대시보드':
         
         # 색상 스케일을 파란색 계열로 가시성 좋게 변경
         fig4 = px.bar(genre_count, x='게임 수', y='장르', orientation='h',
-                     title='장르별 게임 수 (TOP 10)',
-                     labels={'게임 수': '게임 수', '장르': '장르'},
-                     color='게임 수',
-                     color_continuous_scale='Cividis_r') #색깔 선택 가능Blues,Greens,Reds,Purples,Oranges,PuBu,YlGnBu,Viridis,Plasma,Inferno,Magma,Cividis
-        fig4.update_layout(yaxis={'categoryorder':'total ascending'})
+                    title='장르별 게임 수 (TOP 10)',
+                    labels={'게임 수': '게임 수', '장르': '장르'},
+                    color='게임 수',
+                    color_continuous_scale='Cividis_r') #색깔 선택 가능Blues,Greens,Reds,Purples,Oranges,PuBu,YlGnBu,Viridis,Plasma,Inferno,Magma,Cividis
+        fig4.update_layout(
+            yaxis={'categoryorder':'total ascending'},title_font_size=24, font=dict(size=20),
+            xaxis_title_font_size = 20, yaxis_title_font_size = 20
+        )
+
         st.plotly_chart(fig4, use_container_width=True)
     
     with right_col:
@@ -403,8 +371,9 @@ if st.session_state.page == '대시보드':
                         if st.button("상세", key=f"detail_{index}", use_container_width=True):
                             view_detail(index)
 
-elif st.session_state.page == '전체 데이터 보기':
+def render_full_data(df):
     # 상단 필터 섹션
+    all_genres = sorted(list(df['장르'].str.split(',').explode().str.strip().unique()))
     filter_col, _ = st.columns([1, 3])
     
     with filter_col:
@@ -584,9 +553,9 @@ elif st.session_state.page == '전체 데이터 보기':
                 st.session_state.num_to_display += 20
                 st.rerun()
 
-elif st.session_state.page == '게임 상세':
+def render_game_detail(df, df_sales):
     selected_id = st.session_state.get('selected_game_id')
-    
+        
     if st.button("← 목록으로 돌아가기"):
         st.session_state.page = '전체 데이터 보기'
         st.rerun()
@@ -754,3 +723,52 @@ elif st.session_state.page == '게임 상세':
                 st.plotly_chart(fig, use_container_width=True, key=f"price_chart_{cleaned_game_name}")
             else:
                 st.info("해당 게임의 가격 추이 데이터가 없습니다.")
+
+def main():
+    # --- 페이지 설정 ---
+    st.set_page_config(layout="wide")
+    st.title("🔥 게임 할인 정보 대시보드")
+    st.caption("데이터는 웹 스크래핑을 기반으로 수집되었습니다.")
+
+    # --- 데이터 로드 ---
+    try:
+        df = load_data("data/cleaned_merged_games_data.csv")
+        df_sales = load_data("data/combined_sales_data.csv")
+
+    except FileNotFoundError:
+        st.error("오류: 데이터 파일을 찾을 수 없습니다.")
+        st.info("`merged_games_data.csv`와 `combined_sales_data.csv` 파일을 앱과 같은 위치에 넣어주세요.")
+        st.stop()
+
+    # --- 세션 상태 초기화 ---
+    if 'page' not in st.session_state:
+        st.session_state.page = '대시보드'
+    if 'num_to_display' not in st.session_state:
+        st.session_state.num_to_display = 20
+    if 'filtered_df' not in st.session_state:
+        st.session_state.filtered_df = df
+    if 'selected_game_id' not in st.session_state:
+        st.session_state.selected_game_id = None
+
+    # --- 페이지 메뉴 생성 ---
+    st.radio(
+        "메뉴 선택",
+        ['대시보드', '전체 데이터 보기'],
+        key='page_selector',
+        horizontal=True,
+        on_change=set_page
+    )
+
+    # --- 페이지 렌더링 ---
+    if st.session_state.page == '대시보드':
+        render_dashboard(df)
+
+    elif st.session_state.page == '전체 데이터 보기':
+        render_full_data(df)
+
+    elif st.session_state.page == '게임 상세':
+        render_game_detail(df)
+
+# --- 앱 실행 ---
+if __name__ == '__main__':
+    main()
