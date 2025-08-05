@@ -4,6 +4,7 @@ import re
 import plotly.express as px
 import plotly.graph_objects as go
 
+
 # --- HTML 태그 제거 함수 ---
 def remove_html_tags(text):
     """문자열에서 HTML 태그를 제거합니다."""
@@ -12,6 +13,30 @@ def remove_html_tags(text):
         clean = re.sub(r'\s+', ' ', clean).strip()
         return clean
     return str(text)
+
+
+def get_best_price_row(df, game_name):
+    """
+    동일한 게임 이름을 가진 모든 행 중 최저 할인가(무료 = 0)를 가진 행 반환.
+    없으면 None.
+    """
+    same = df[df["게임 이름"] == game_name].copy()
+    if same.empty:
+        return None
+
+    same["numeric_sales"] = (
+        same["할인가"]
+        .astype(str)
+        .str.replace("무료", "0")
+        .str.replace("₩", "")
+        .str.replace(",", "")
+    )
+    
+    # 숫자 변환 시도
+    same["numeric_sales"] = pd.to_numeric(same["numeric_sales"], errors='coerce').fillna(float('inf'))
+    
+    return same.loc[same["numeric_sales"].idxmin()]
+
 
 def clean_game_name_final(name):
     """
@@ -48,6 +73,7 @@ def clean_game_name_final(name):
     cleaned_name = cleaned_name.strip()
 
     return cleaned_name
+
 
 def visualize(game_data):
     # '할인 시작일'를 datetime 형식으로 변환
@@ -94,6 +120,7 @@ def visualize(game_data):
 
     return fig
 
+
 # --- 가격 형식 변환 함수 ---
 def format_display_price(price_string):
     """가격 문자열을 보기 좋은 형식으로 변환합니다."""
@@ -118,6 +145,7 @@ def format_display_price(price_string):
             return cleaned
     return cleaned
 
+
 # --- 데이터 로딩 ---
 @st.cache_data
 def load_data(path):
@@ -137,6 +165,7 @@ def load_data(path):
     df['사이트 URL'] = df['사이트 URL'].fillna('')
     
     return df
+
 
 # --- 샘플 데이터 생성 (실제 파일이 없을 경우) ---
 def create_sample_data():
@@ -179,14 +208,17 @@ def create_sample_data():
     }
     return pd.DataFrame(sample_data)
 
+
 # --- 페이지 전환 함수 ---
 def set_page():
     st.session_state.page = st.session_state.page_selector
+
 
 def view_detail(game_id):
     st.session_state.selected_game_id = game_id
     st.session_state.page = '게임 상세'
     st.rerun()
+
 
 def render_dashboard(df):
     col1, col2, col3 = st.columns(3)
@@ -325,25 +357,30 @@ def render_dashboard(df):
                 st.info("현재 할인 중인 게임이 없습니다.")
             else:
                 for index, row in discounted_games_df.iterrows():
+                    # 🔥 NEW: 최저가 행 찾기
+                    best_row = get_best_price_row(df, row['게임 이름'])
+                    if best_row is None:
+                        best_row = row
+                    
                     img_col, info_col, price_col, btn_col = st.columns([2, 3, 2, 1.8])
                     
                     with img_col:
-                        st.image(row['이미지 URL'], use_container_width=True)
+                        st.image(best_row['이미지 URL'], use_container_width=True)
                     
                     with info_col:
-                        st.markdown(f"**{row['게임 이름']}**")
-                        st.caption(f"플랫폼: {row['플랫폼 이름']}")
+                        st.markdown(f"**{best_row['게임 이름']}**")
+                        st.caption(f"플랫폼: {best_row['플랫폼 이름']}")
                     
                     with price_col:
                         discount_html, price_html = "", ""
-                        discount_str = str(row['할인율'])
+                        discount_str = str(best_row['할인율'])
                         discount_num = pd.to_numeric(discount_str.replace('%', ''), errors='coerce')
                         
                         if pd.notna(discount_num) and discount_num > 0:
                             discount_html = f'<span style="background-color: #d43f3a; color: white; border-radius: 5px; padding: 3px 8px; font-weight: bold; font-size: 0.9em;">-{int(discount_num)}%</span>'
                         
-                        original_price_display = format_display_price(row['원가'])
-                        sales_price_display = format_display_price(row['할인가'])
+                        original_price_display = format_display_price(best_row['원가'])
+                        sales_price_display = format_display_price(best_row['할인가'])
                         
                         if original_price_display != sales_price_display and '품절' not in sales_price_display:
                             price_html = f'<div style="text-align: right;"><span style="font-size: 0.8em; color: grey;"><del>{original_price_display}</del></span><br><strong style="font-size: 1.2em;">{sales_price_display}</strong></div>'
@@ -370,6 +407,7 @@ def render_dashboard(df):
                         """, unsafe_allow_html=True)
                         if st.button("상세", key=f"detail_{index}", use_container_width=True):
                             view_detail(index)
+
 
 def render_full_data(df):
     # 상단 필터 섹션
@@ -508,11 +546,16 @@ def render_full_data(df):
         
         for index, row in results_to_show.iterrows():
             with cols[col_index]:
+                # 🔥 NEW: 최저가 행 찾기
+                best_row = get_best_price_row(df, row['게임 이름'])
+                if best_row is None:
+                    best_row = row
+                
                 # 할인율 처리
-                discount_str = str(row['할인율'])
+                discount_str = str(best_row['할인율'])
                 discount_num = pd.to_numeric(discount_str.replace('%', ''), errors='coerce')
-                original_price_display = format_display_price(row['원가'])
-                sales_price_display = format_display_price(row['할인가'])
+                original_price_display = format_display_price(best_row['원가'])
+                sales_price_display = format_display_price(best_row['할인가'])
                 
                 # 할인 배지 설정
                 discount_badge = ""
@@ -530,9 +573,9 @@ def render_full_data(df):
                 # 게임 카드 HTML
                 card_html = (
                     f'<div class="game-card">'
-                    f'<img src="{row["이미지 URL"]}" alt="{row["게임 이름"]}">'
-                    f'<div class="game-title">{row["게임 이름"]}</div>'
-                    f'<div class="game-genre">장르: {row["장르"][:30]}{"..." if len(row["장르"]) > 30 else ""}</div>'
+                    f'<img src="{best_row["이미지 URL"]}" alt="{best_row["게임 이름"]}">'
+                    f'<div class="game-title">{best_row["게임 이름"]}</div>'
+                    f'<div class="game-genre">장르: {best_row["장르"][:30]}{"..." if len(best_row["장르"]) > 30 else ""}</div>'
                     f'<div class="price-container">'
                     f'{price_info_html}'
                     f'</div>'
@@ -553,6 +596,7 @@ def render_full_data(df):
                 st.session_state.num_to_display += 20
                 st.rerun()
 
+
 def render_game_detail(df, df_sales):
     selected_id = st.session_state.get('selected_game_id')
         
@@ -572,27 +616,32 @@ def render_game_detail(df, df_sales):
         else:
             game_data = df.loc[selected_id]
             
-            st.header(game_data['게임 이름'])
-            st.caption(f"플랫폼: {game_data['플랫폼 이름']} | 장르: {game_data['장르']}")
+            # 🔥 NEW: 최저가 행 찾기
+            best_row = get_best_price_row(df, game_data['게임 이름'])
+            if best_row is None:
+                best_row = game_data
+            
+            st.header(best_row['게임 이름'])
+            st.caption(f"플랫폼: {best_row['플랫폼 이름']} | 장르: {best_row['장르']}")
             st.markdown("---")
             
             img_col, info_col = st.columns([2, 3])
             
             with img_col:
-                st.image(game_data['이미지 URL'], use_container_width=True)
+                st.image(best_row['이미지 URL'], use_container_width=True)
             
             with info_col:
                 st.subheader("가격 정보")
                 
                 discount_html, price_html = "", ""
-                discount_str = str(game_data['할인율'])
+                discount_str = str(best_row['할인율'])
                 discount_num = pd.to_numeric(discount_str.replace('%', ''), errors='coerce')
                 
                 if pd.notna(discount_num) and discount_num > 0:
                     discount_html = f'<span style="background-color: #d43f3a; color: white; border-radius: 5px; padding: 3px 8px; font-weight: bold; font-size: 0.9em;">-{int(discount_num)}%</span>'
                 
-                original_price_display = format_display_price(game_data['원가'])
-                sales_price_display = format_display_price(game_data['할인가'])
+                original_price_display = format_display_price(best_row['원가'])
+                sales_price_display = format_display_price(best_row['할인가'])
                 
                 if original_price_display != sales_price_display and '품절' not in sales_price_display:
                     price_html = f'<div style="text-align: left;"><span style="font-size: 1.1em; color: grey;"><del>{original_price_display}</del></span><br><strong style="font-size: 1.8em; color: #d32f2f;">{sales_price_display}</strong></div>'
@@ -604,9 +653,9 @@ def render_game_detail(df, df_sales):
                 
                 st.subheader(" ")
                 
-                # 구매 링크 버튼
-                if game_data['사이트 URL']:
-                    st.link_button("🛒 구매하러 가기", game_data['사이트 URL'])
+                # 구매 링크 버튼 - 최저가 사이트로 링크
+                if best_row['사이트 URL']:
+                    st.link_button("🛒 구매하러 가기", best_row['사이트 URL'])
             
             # 사이트별 가격 비교 - 간단한 방식으로 수정
             st.markdown("---")
@@ -619,8 +668,7 @@ def render_game_detail(df, df_sales):
                 'greenmangaming': 'https://mcvuk.com/wp-content/uploads/green-man-gaming-logo_rgb_light-bg_copypng.png'
             }
 
-            
-            game_name = game_data['게임 이름']
+            game_name = best_row['게임 이름']
             related_games = df[df['게임 이름'] == game_name]
             
             stores_data = {
@@ -710,7 +758,7 @@ def render_game_detail(df, df_sales):
             st.subheader("📈 가격 추이")
             
             # '게임 이름' 클리닝
-            cleaned_game_name = clean_game_name_final(game_data['게임 이름'])
+            cleaned_game_name = clean_game_name_final(best_row['게임 이름'])
 
             # combined_sales_data.csv에서 해당 게임의 데이터 필터링
             game_sales_data = df_sales[df_sales['게임 이름'] == cleaned_game_name]
@@ -722,6 +770,7 @@ def render_game_detail(df, df_sales):
                 st.plotly_chart(fig, use_container_width=True, key=f"price_chart_{cleaned_game_name}")
             else:
                 st.info("해당 게임의 가격 추이 데이터가 없습니다.")
+
 
 def main():
     # --- 페이지 설정 ---
@@ -769,6 +818,7 @@ def main():
 
     elif st.session_state.page == '게임 상세':
         render_game_detail(df, df_sales)
+
 
 # --- 앱 실행 ---
 if __name__ == '__main__':
